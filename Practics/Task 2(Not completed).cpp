@@ -1,364 +1,421 @@
 #include <iostream>
-#include <algorithm>
+#include <cmath>
 
 using namespace std;
-
 class MyArrayParent
+
 {
 protected:
-	int capacity, count;
-	double* ptr;
+	int capacity; //сколько памяти выделено
+	int count; //количество элементов 
+	double* ptr; //массив
 public:
-
-	MyArrayParent(int dimension = 100)
+	MyArrayParent(int Dimension = 100)
 	{
-		ptr = new double[dimension];
-		capacity = dimension;
+		cout << "\nMyArray constructor\n";
+		ptr = new double[Dimension];
+		capacity = Dimension;
 		count = 0;
 	}
 
-	//Конструктором, принимающим и копирующим информацию из существующего массива.
-	MyArrayParent(double* arr, int len)
+	//конструктор копий
+	MyArrayParent(const MyArrayParent& V)
 	{
+		cout << "\nCopy constructor\n";
+		count = V.count;
+		capacity = V.capacity;
+		ptr = new double[capacity];
+		for (int i = 0; i < count; i++)
+		{
+			ptr[i] = (V.ptr)[i];
+		}
+	}
+
+	//конструктор принимает существующий массив
+	MyArrayParent(double* V, int len)
+	{
+		cout << "\nMyArray constructor\n";
 		count = len;
 		capacity = len;
 		ptr = new double[len];
-
 		for (int i = 0; i < count; i++)
-			ptr[i] = arr[i];
-	}
-
-	//Конструктором копий MyArrayParent (const MyArrayParent& v).	
-	MyArrayParent(const MyArrayParent& array)
-	{
-		ptr = new double[array.capacity];
-		count = array.count;
-		capacity = array.capacity;
-
-		for (int i = 0; i < array.capacity; i++)
-			ptr[i] = array.ptr[i];
+		{
+			ptr[i] = V[i];
+		}
 	}
 
 	~MyArrayParent()
 	{
-		delete[] ptr;
+		cout << "\nMyArray destructor\n";
+		if (ptr != NULL)
+		{
+			delete[] ptr;
+			ptr = NULL;
+		}
 	}
 
-	int GetCapacity()
+	int Capacity() { return capacity; }
+	int Size() { return count; }
+
+	double GetComponent(int index)
 	{
-		return capacity;
+		if (index >= 0 && index < count)
+			return ptr[index];
+		return -1;
 	}
 
-	int GetSize()
+	void SetComponent(int index, double value)
 	{
-		return count;
+		if (index >= 0 && index < count)
+			ptr[index] = value;
 	}
 
-	double GetComponent(int n)
-	{
-		if (n < 0 || n >= capacity)
-			return 0.0;
-
-		return ptr[n];
-	}
-
-	void SetComponent(int n, double value)
-	{
-		if (n >= 0 && n < count)
-			ptr[n] = value;
-	}
-
-	virtual void RemoveLastValue()
-	{
-		if (count > 0)
-			count--;
-	}
-
-	//Оператором [ ] для обращения к элементу по индексу.
-	double& operator[](int n)
-	{
-		return ptr[n];
-	};
-
-	virtual void Push(double value)
+	virtual void push(double value)
 	{
 		if (count < capacity)
 		{
 			ptr[count] = value;
 			count++;
 		}
+		else
+			cout << "В массиве нет места!\n";
 	}
 
-	//поиск элемента
-	virtual int IndexOf(double value, bool bFindFromStart = true)
+	//удаление элемента с конца
+	void RemoveLastValue()
 	{
+		if (count >= 0)
+			count--;
+	}
+
+	double& operator[](int index)
+	{
+		return ptr[index];
+	}
+
+	MyArrayParent& operator=(const MyArrayParent& V)
+	{
+		delete[] ptr;
+		capacity = V.capacity;
+		count = V.count;
+		ptr = new double[capacity];
+		for (int i = 0; i < count; i++)
+		{
+			ptr[i] = V.ptr[i];
+		}
+		return *this;
+	}
+
+	void print()
+	{
+		cout << "\nMyArr, size: " << count << ", values: {";
+		int i = 0;
+		for (i = 0; i < count; i++)
+		{
+			cout << ptr[i];
+			if (i != count - 1)
+				cout << ", ";
+		}
+		cout << "}\n";
+	}
+
+	int IndexOf(double value, bool bFindFromStart) // доделал поиск с конца 
+	{
+		int i = 0;
 		if (bFindFromStart)
 		{
-			for (int i = 0; i < count; i++)
+			for (i = 0; i < count; i++)
+			{
 				if (ptr[i] == value)
 					return i;
+			}
+
 		}
 		else
 		{
-			for (int i = count - 1; i >= 0; i--)
+			for (i = count - 1; i >= 0; i--)
+			{
 				if (ptr[i] == value)
 					return i;
+			}
 		}
-
 		return -1;
-	};
-
-	//Оператором =.
-	MyArrayParent operator =(MyArrayParent array)
-	{
-		if (capacity != array.capacity)
-		{
-			capacity = array.capacity;
-			delete[] ptr;
-			ptr = new double[capacity];
-		}
-
-		count = array.count;
-
-		for (int i = 0; i < array.capacity; i++)
-			ptr[i] = array.ptr[i];
-
-		return *this;
-	};
-
-	double GetAverage()
-	{
-		// Нахожу среднее арифметическое
-		double average = 0.0;
-
-		for (int i = 0; i < count; i++)
-			average += ptr[i];
-
-		average /= count;
-
-		return average;
-	};
+	}
 };
 
 class MyArrayChild : public MyArrayParent
 {
 public:
-	MyArrayChild(int dimension = 100) : MyArrayParent(dimension) { };
+	MyArrayChild(int Dimension = 100) : MyArrayParent(Dimension)
+	{
+		cout << "\nMyArrayChild constructor\n";
+	}
 
-	MyArrayChild(double* arr, int len) : MyArrayParent(arr, len) { };
+	MyArrayChild(double* V, int len) : MyArrayParent(V, len)
+	{
+		cout << "\nMyArrayChild constructor\n";
+	}
 
-	MyArrayChild(const MyArrayChild& arr) : MyArrayParent(arr) { };
-
-	~MyArrayChild() { };
+	~MyArrayChild() { cout << "\nMyArrayChild destructor\n"; }
 
 	//удаление элемента
-	virtual void RemoveAt(int index = -1)
+	void RemoveAt(int index)
 	{
-		if (index < 0)
-			return;
-
-		for (int i = index; i < count; i++)
-			ptr[i] = ptr[i + 1];
-
-		count--;
-	};
+		if (index < count && index >= 0)
+		{
+			for (int i = index; i < count - 1; i++)
+				ptr[i] = ptr[i + 1];
+			count--;
+		}
+		else
+			cout << "Ошибка индекса при удалении элемента!\n";
+	}
 
 	//вставка элемента
-	virtual void InsertAt(double value, int index = -1)
+	void InsertAt(double value, int index)
 	{
-		if (count >= capacity)
+		if (index == 0 && count == 0)
+		{
+			push(value);
 			return;
+		}
+		if (index < count && index >= 0)
+		{
+			if (count != capacity)
+				count++;
+			for (int i = count - 2; i >= index; i--)
+				ptr[i + 1] = ptr[i];
+			ptr[index] = value;
+		}
+		else
+			cout << "Ошибка индекса при вставке!\n";
+	}
 
-		if (index == -1)
-			Push(value);
-
-		if (index < 0 || index > count)
-			return;
-
-		for (int i = count; i > index; i--)
-			ptr[i] = ptr[i - 1];
-
-		ptr[index] = value;
-
-		count++;
-	};
-
-	//Все повторяющиеся элементы (дубли) заменить средним арифме-тическим исходного массива
 	MyArrayChild SpecFunc()
 	{
-		double sum = ptr[0];
-		int num_uniques = 1;
-		// подсчет суммы уникальных элементов
-		for (int i = 1; i < count; i++) {
-			if (ptr[i] != ptr[i - 1]) { // ptr[i] не является дублем
-				sum += ptr[i];
-				num_uniques++;
+		MyArrayChild res(*this);
+
+		for (int i = 0; i < res.count; i++)
+		{
+			double sum = 0;
+			int count = 0;
+			for (int j = 0; j < res.count; j++)
+			{
+				if (i != j && res.ptr[i] == res.ptr[j])
+				{
+					sum += res.ptr[j];
+					count++;
+				}
+			}
+			if (count > 0)
+			{
+				double average = sum / count;
+				for (int j = 0; j < res.count; j++)
+				{
+					if (i != j && res.ptr[i] == res.ptr[j])
+					{
+						res.ptr[j] = average;
+					}
+				}
 			}
 		}
-		if (num_uniques == 0) return; // нет уникальных элементов
-		double mean = sum / num_uniques; // среднее арифметическое уникальных элементов
-		// замена дублей на среднее арифметическое
-		for (int i = 1; i < count; i++) {
-			if (ptr[i] == ptr[i - 1]) { // ptr[i] является дублем
-				ptr[i] = mean;
-			}
+		return res;
+	}
+
+	// Перегрузка оператора + 
+	MyArrayChild operator+(double value) {
+		MyArrayChild res = *this;
+		res.push(value);
+		return res;
+	}
+
+	// Функция выделения подпоследователньости
+	MyArrayChild SubSequence(int StartIndex = 0, int Length = -1)
+	{
+		MyArrayChild res(abs(Length) * 2);
+		res.count = Length;
+		if (Length < 0) {
+			res.count = 0;
+			return res;
 		}
+		for (int i = 0; i < Length; i++)
+			res.ptr[i] = ptr[i + StartIndex];
+		return res;
 	}
 
-	MyArrayChild SubSequence(int start, int length)
-	{
-		MyArrayChild sub(length);
-
-		int end = start + length > count ? count : start + length;
-
-		for (int i = start; i < end; i++)
-			sub.Push(ptr[i]);
-
-		return sub;
-	}
-
-	MyArrayChild operator+(double value)
-	{
-		MyArrayChild arr(*this);
-		arr.Push(value);
-		return arr;
-	}
 };
 
 class MySortedArray : public MyArrayChild
 {
 protected:
-	virtual int BinarySearchInsert(double value)
+	int more_bin(double x)
 	{
-		// Бинарный поиск
+		int left = 0, right = count - 1, mean = (right + left) / 2;
 
-		int left = -1, right = count;
-
-		while (left + 1 < right)
+		while (right > left + 1)
 		{
-			int midd = (left + right) / 2;
-
-			if (ptr[midd] == value)
-				return midd;
-			else if (ptr[midd] > value)
-				right = midd;
+			if (ptr[mean] == x)
+				return mean;
+			if (ptr[mean] > x)
+				right = mean;
 			else
-				left = midd;
+				left = mean;
+			mean = (right + left) / 2;
 		}
-
-		return right;
-	}
-
-	virtual int BinarySearchRecursion(double value, int left, int right)
-	{
-		int middle = (left + right) / 2;
-
-		if (ptr[middle] == value)
-			return middle;
-
-		if (middle == right || middle == left)
-			return -1;
-
-		if (ptr[middle] < value)
-			return BinarySearchRecursion(value, middle, right);
-		else if (ptr[middle] > value)
-			return BinarySearchRecursion(value, left, middle);
-
-		return -1;
+		if (ptr[left] >= x)
+			return left;
+		else
+			return right;
 	}
 
 public:
-	MySortedArray(int dimension = 100) : MyArrayChild(dimension) { }
-
-	MySortedArray(double* arr, int len) : MyArrayChild(arr, len) { };
-
-	MySortedArray(const MySortedArray& arr) : MyArrayChild(arr) { };
-
-	~MySortedArray() { }
-
-	virtual void Push(double value) override
+	MySortedArray(int s = 100) : MyArrayChild(s)
 	{
-		if (count >= capacity)
-			return;
+		cout << "\nSorted constructor\n";
+	}
+	~MySortedArray() { cout << "\nSorted destructor\n"; }
 
-		InsertAt(value, BinarySearchInsert(value));
+	virtual void push(double value)
+	{
+		if (count < capacity)
+		{
+			if (count == 0)
+			{
+				MyArrayParent::push(value);
+				return;
+			}
+			int index = more_bin(value);
+			if (index == count - 1)
+				if (ptr[index] <= value)
+				{
+					MyArrayChild::push(value);
+					return;
+				}
+			InsertAt(value, index);
+		}
+		else
+			cout << "В массиве нет места!\n";
+	}
+
+	virtual int IndexOf(double x)
+	{
+		int a = more_bin(x);
+		if (ptr[a] == x)
+			return a;
+		else
+			return -1;
 	}
 
 	MySortedArray SpecFunc()
 	{
-		double sum = ptr[0];
-		int num_uniques = 1;
-		// подсчет суммы уникальных элементов
-		for (int i = 1; i < count; i++) {
-			if (ptr[i] != ptr[i - 1]) { // ptr[i] не является дублем
-				sum += ptr[i];
-				num_uniques++;
+		MySortedArray res(*this);
+
+		for (int i = 0; i < res.count; i++)
+		{
+			double sum = 0;
+			int count = 0;
+			for (int j = 0; j < res.count; j++)
+			{
+				if (i != j && res.ptr[i] == res.ptr[j])
+				{
+					sum += res.ptr[j];
+					count++;
+				}
+			}
+			if (count > 0)
+			{
+				double average = sum / count;
+				for (int j = 0; j < res.count; j++)
+				{
+					if (i != j && res.ptr[i] == res.ptr[j])
+					{
+						res.ptr[j] = average;
+					}
+				}
 			}
 		}
-		if (num_uniques == 0) return; // нет уникальных элементов
-		double mean = sum / num_uniques; // среднее арифметическое уникальных элементов
-		// замена дублей на среднее арифметическое
-		for (int i = 1; i < count; i++) {
-			if (ptr[i] == ptr[i - 1]) { // ptr[i] является дублем
-				ptr[i] = mean;
-			}
-		}
+		return res;
 	}
 
-	virtual int IndexOf(double value, bool bFindFromStart = true) override
-	{
-		int i = BinarySearchInsert(value);
-
-		return ptr[i] == value ? i : -1;
-	}
 };
-
-void PrintArray(MyArrayParent array)
-{
-	int capacity = array.GetCapacity();
-	int size = array.GetSize();
-
-	for (int i = 0; i < capacity; i++)
-		if (i < size)
-			cout << '[' << i << "]\t" << array.GetComponent(i) << endl;
-		else
-			cout << '[' << i << "]\t[_]" << endl;
-}
 
 int main()
 {
+	setlocale(LC_ALL, "Russian");
 
-	MyArrayChild arr(8);
-	arr.Push(3);
+	cout << "Проверка #2.1: " << endl;
 
-	cout << "Array:" << endl; PrintArray(arr);
+	MyArrayParent arr(15), arr2(10);
 
-	MyArrayChild arr2 = arr + 2;
-	arr2.Push(4);
-	arr2.Push(6);
-	arr2.Push(4);
-	arr2.Push(4);
-	arr2.Push(9);
-	arr2.Push(8);
+	for (int i = 0; i < 10; i++)
+	{
+		arr2.push(20 - i);
+	}
 
-	cout << "Array2:" << endl; PrintArray(arr2);
+	arr2.print();
+	cout << arr2.IndexOf(17, true); // поиск сначала
+	cout << "\n" << arr2.IndexOf(14, false); // поиск с конца
 
-	arr2.RemoveAt(7);
-	arr2.InsertAt(1, 7);
-	arr2.SpecFunc();
-	
-	cout << "Array3:" << endl; PrintArray(arr2);
+	MyArrayParent arr3(arr2);
+	arr3.print();
 
-	MyArrayParent arr3(12);
-	arr3.Push(1);
-	arr3.Push(4);
-	arr3.Push(5);
-	arr3.Push(8);
-	arr3.Push(1);
-	arr3.Push(9);
-	cout << "До:" << endl; PrintArray(arr3);
-	arr3.Push(6);
-	cout << "После:" << endl; PrintArray(arr3);
+	arr = arr2;
+	arr.print();
+
+	cout << "Элемент с индексом 3: " << arr[3] << endl;
+
+	double* temp = new double[20];
+
+	for (int i = 0; i < 20; i++)
+	{
+		temp[i] = i + 5;
+	}
+
+	MyArrayParent arr4(temp, 20);
+	arr4.print();
+
+	cout << "Индекс элемента 94: " << arr4.IndexOf(94, true) << endl;
+
+	cout << "\nПроверка #2.2: " << endl;
+	MyArrayChild arr5(10);
+	arr5.push(5);
+	arr5.push(6);
+	arr5.push(3);
+	arr5.push(3);
+	arr5.push(6);
+	arr5.push(6);
+	arr5.push(5);
+	arr5.InsertAt(3, 6);
+	arr5.SpecFunc();
+	arr5.print();
+
+
+
+	cout << "\nПроверка #2.3: " << endl;
+	MySortedArray arr7(10);
+	for (int i = 0; i < 10; i++)
+	{
+		arr7.push(4 + i);
+	}
+	cout << "Отсортированный массив: ";
+	arr7.print();
+	double arr1[10] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+
+	MyArrayChild arr9;
+	int i = 0;
+	for (i = 10; i >= 0; i--)
+	{
+		arr9.push(i + 1);
+	}
+	arr9.print();
+	MyArrayChild arr10 = arr9.SubSequence(6, 3); // Проверка функции веделения подпоследовательности
+	arr10.print();
+	arr10 = arr10 + 5; // Проверка перегрузки оператора +
+	arr10.print();
+
+	cout << "Индекс элемента 4: " << arr7.IndexOf(4) << endl;
+
+
 
 	return 0;
 }
