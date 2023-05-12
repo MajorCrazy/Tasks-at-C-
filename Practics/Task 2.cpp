@@ -193,32 +193,54 @@ public:
 
 	MyArrayChild SpecFunc()
 	{
-		MyArrayChild res(*this);
+		MyArrayChild res(count);
+		double sum = 0;
+		int numuniq = 0;
+		bool found = false;
 
-		for (int i = 0; i < res.count; i++)
+		// Вычисляет среднее значение массива
+		for (int i = 0; i < count; i++)
 		{
-			double sum = 0;
-			int count = 0;
-			for (int j = 0; j < res.count; j++)
+			found = false;
+			for (int j = 0; j < i; j++)
 			{
-				if (i != j && res.ptr[i] == res.ptr[j])
+				if (ptr[i] == ptr[j])
 				{
-					sum += res.ptr[j];
-					count++;
+					found = true;
+					break;
 				}
 			}
-			if (count > 0)
+			if (!found)
 			{
-				double average = sum / count;
-				for (int j = 0; j < res.count; j++)
-				{
-					if (i != j && res.ptr[i] == res.ptr[j])
-					{
-						res.ptr[j] = average;
-					}
-				}
+				sum += ptr[i];
+				numuniq++;
 			}
 		}
+
+		double average = sum / numuniq;
+
+		// Заменяет дубли
+		for (int i = 0; i < count; i++)
+		{
+			found = false;
+			for (int j = 0; j < i; j++)
+			{
+				if (ptr[i] == ptr[j])
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found)
+			{
+				res.push(average);
+			}
+			else
+			{
+				res.push(ptr[i]);
+			}
+		}
+
 		return res;
 	}
 
@@ -308,32 +330,53 @@ public:
 
 	MySortedArray SpecFunc()
 	{
-		MySortedArray res(*this);
+		MySortedArray res(count);
+		double sum = 0;
+		int numuniq = 0;
+		bool found = false;
 
-		for (int i = 0; i < res.count; i++)
+		// Вычисляет среднее значение массива
+		for (int i = 0; i < count; i++)
 		{
-			double sum = 0;
-			int count = 0;
-			for (int j = 0; j < res.count; j++)
+			found = false;
+			for (int j = 0; j < i; j++)
 			{
-				if (i != j && res.ptr[i] == res.ptr[j])
+				if (ptr[i] == ptr[j])
 				{
-					sum += res.ptr[j];
-					count++;
+					found = true;
+					break;
 				}
 			}
-			if (count > 0)
+			if (!found)
 			{
-				double average = sum / count;
-				for (int j = 0; j < res.count; j++)
-				{
-					if (i != j && res.ptr[i] == res.ptr[j])
-					{
-						res.ptr[j] = average;
-					}
-				}
+				sum += ptr[i];
+				numuniq++;
 			}
 		}
+
+		double average = sum / numuniq;
+		// Заменяет дубли
+		for (int i = 0; i < count; i++)
+		{
+			found = false;
+			for (int j = 0; j < i; j++)
+			{
+				if (ptr[i] == ptr[j])
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found)
+			{
+				res.push(average);
+			}
+			else
+			{
+				res.push(ptr[i]);
+			}
+		}
+
 		return res;
 	}
 
@@ -385,11 +428,15 @@ int main()
 	arr5.push(6);
 	arr5.push(6);
 	arr5.push(5);
+	cout << "Вставка элемента 42 по индексу 2: ";
 	arr5.InsertAt(3, 6);
-	arr5.SpecFunc();
 	arr5.print();
-
-
+	cout << "Удаление элемента массива по индексу 5: ";
+	arr5.RemoveAt(5);
+	arr5.print();
+	
+	MyArrayChild arr10 = arr5.SpecFunc();
+	arr10.print(); // Демонстрация работы функции, которая заменяет дубли на среднее значение массива
 
 	cout << "\nПроверка #2.3: " << endl;
 	MySortedArray arr7(10);
@@ -401,21 +448,30 @@ int main()
 	arr7.print();
 	double arr1[10] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
-	MyArrayChild arr9;
+	MySortedArray arr11(5);
+	arr11.push(5);
+	arr11.push(2);
+	arr11.push(5);
+	arr11.push(1);
+	arr11.push(9);
+	arr11.print();
+
+	MySortedArray arr12 = arr11.SpecFunc();
+	arr12.print();
+
+	MyArrayChild arr8;
 	int i = 0;
 	for (i = 10; i >= 0; i--)
 	{
-		arr9.push(i + 1);
+		arr8.push(i + 1);
 	}
+	arr8.print();
+	MyArrayChild arr9 = arr8.SubSequence(6, 3); // Проверка функции веделения подпоследовательности
 	arr9.print();
-	MyArrayChild arr10 = arr9.SubSequence(6, 3); // Проверка функции веделения подпоследовательности
-	arr10.print();
-	arr10 = arr10 + 5; // Проверка перегрузки оператора +
-	arr10.print();
+	arr9 = arr9 + 5; // Проверка перегрузки оператора +
+	arr9.print();
 
 	cout << "Индекс элемента 4: " << arr7.IndexOf(4) << endl;
-
-
 
 	return 0;
 }
