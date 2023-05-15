@@ -49,12 +49,12 @@ public:
 		b1 = b;
 	}
 
-	virtual void print()
+	virtual void print() override
 	{
 		cout << "B1" << endl;
 	}
 
-	virtual void show()
+	virtual void show() override
 	{
 		cout << "\ta = " << a1 << endl << 
 			"\tb = " << b1 << endl;
@@ -64,56 +64,56 @@ public:
 class B2 : virtual public A1
 {
 protected:
-	int b1;
+	int b2;
 
 public:
 	B2() : A1(0)
 	{
-		b1 = 0;
+		b2 = 0;
 	}
 
 	B2(int a, int b) : A1(a)
 	{
-		b1 = b;
+		b2 = b;
 	}
 
-	virtual void print() 
+	virtual void print() override
 	{
 		cout << "B2" << endl;
 	}
 
-	virtual void show() 
+	virtual void show() override
 	{
 		cout << "\ta = " << a1 << endl <<
-			"\tb = " << b1 << endl;
+			"\tb = " << b2 << endl;
 	}
 };
 
 class B3 : virtual public A1
 {
 protected:
-	int b1;
+	int b3;
 
 public:
 	B3() : A1(0)
 	{
-		b1 = 0;
+		b3 = 0;
 	}
 
 	B3(int a, int b) : A1(a)
 	{
-		b1 = b;
+		b3 = b;
 	}
 
-	virtual void print() 
+	virtual void print() override
 	{
 		cout << "B3" << endl;
 	}
 
-	virtual void show() 
+	virtual void show() override
 	{
 		cout << "\ta = " << a1 << endl <<
-			"\tb = " << b1 << endl;
+			"\tb = " << b3 << endl;
 	}
 };
 
@@ -123,23 +123,23 @@ protected:
 	int c1;
 
 public:
-	C1(int a, int b, int c, int d, int e) : B1(10, b), B2(11, c), B3(12, d)
+	C1(int a, int b, int c, int d, int e) : B1(a, b), B2(a, c), B3(a, d)
 	{
 		c1 = e;
 		a1 = a;
 	}
 
-	virtual void print() 
+	virtual void print() override
 	{
 		cout << "C1" << endl;
 	}
 
-	virtual void show() 
+	virtual void show() override
 	{
 		cout << "\ta = " << a1 << endl <<
 			"\tb (B1) = " << B1::b1 << endl <<
-			"\tb (B2) = " << B2::b1 << endl <<
-			"\tb (B3) = " << B3::b1 << endl <<
+			"\tb (B2) = " << B2::b2 << endl <<
+			"\tb (B3) = " << B3::b3 << endl <<
 			"\tc = " << c1 << endl;
 	}
 };
@@ -147,27 +147,27 @@ public:
 class C2 : virtual public B1, virtual public B2, virtual public B3
 {
 protected:
-	int c1;
+	int c2;
 
 public:
-	C2(int a, int b, int c, int d, int e) : B1(13, b), B2(14, c), B3(15, d)
+	C2(int a, int b, int c, int d, int e) : B1(a, b), B2(a, c), B3(a, d)
 	{
-		c1 = e;
+		c2 = e;
 		a1 = a;
 	}
 
-	virtual void print() 
+	virtual void print() override
 	{
 		cout << "C2" << endl;
 	}
 
-	virtual void show() 
+	virtual void show() override
 	{
 		cout << "\ta = " << a1 << endl <<
 			"\tb (B1) = " << B1::b1 << endl <<
-			"\tb (B2) = " << B2::b1 << endl <<
-			"\tb (B3) = " << B3::b1 << endl <<
-			"\tc = " << c1 << endl;
+			"\tb (B2) = " << B2::b2 << endl <<
+			"\tb (B3) = " << B3::b3 << endl <<
+			"\tc = " << c2 << endl;
 	}
 };
 
@@ -177,28 +177,24 @@ protected:
 	int d1;
 
 public:
-	D1(int a, int b, int c, int d, int e, int f, int g, int h, int q) : C1(16, 17, 18, 19, 20), C2(21, 22, 23, 24, 25)
+	D1(int a, int b, int c, int d, int e, int f, int q) : C1(a, b, c, d, e), C2(a, b, c, d, f), B1(a, b), B2(a, c), B3(a, d)
 	{
 		d1 = q;
-		a1 = a;
-		b1 = b, c, d, f, g;
-		c1 = e, h;
-
 	}
 
-	virtual void print() 
+	void print() override
 	{
 		cout << "D1" << ::endl;
 	}
 
-	virtual void show() 
+	void show() override
 	{
 		cout << "\ta = " << a1 << endl <<
-			"\tb (B1) = " << B1::b1 << endl <<
-			"\tb (B2) = " << B2::b1 << endl <<
-			"\tb (B3) = " << B3::b1 << endl <<
-			"\tc (C1) = " << C1::c1 << endl <<
-			"\tc (C2) = " << C2::c1 << endl <<
+			"\tb (B1) = " << b1 << endl <<
+			"\tb (B2) = " << b2 << endl <<
+			"\tb (B3) = " << b3 << endl <<
+			"\tc (C1) = " << c1 << endl <<
+			"\tc (C2) = " << c2 << endl <<
 			"\td = " << d1 << endl;
 	}
 };
@@ -206,19 +202,29 @@ public:
 int main()
 {
 	A1 a1(1);
+
 	a1.print();
 	a1.show();
+	
 	B3 b3(2, 3);
+
 	b3.print();
 	b3.show();
+
 	C2 c2(4, 5, 6, 7, 8);
+
 	c2.print();
 	c2.show();
-	D1 d1(11, 12, 13, 14, 15, 16, 17, 18, 19);
+
+	D1 d1(9, 10, 11, 12, 13, 14, 15);
+
 	d1.print();
 	d1.show();
+
 	A1* pa1 = &d1;
+
 	pa1->print();
 	pa1->show();
+
 	return 0;
 }
