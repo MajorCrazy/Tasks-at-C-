@@ -1,100 +1,153 @@
-// Practice_1_Second_Year.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+// Понамарёв Никита, КМБО-04-22, Вариант 17
+// Задание 1.1-1.2
 
 #include <iostream>
 #include <list>
-#include <complex>
-#include <functional>
 
 using namespace std;
 
-// Псевдоним для комплексных чисел
-using Complex = complex<double>;
+class Customers
+{
+public:
+	string Last_Name;
+	string First_Name;
+	string City;
+	string Street;
+	int House_Number;
+	int Flat_Number;
+	int Account_Number;
+	double Average_Check;
 
-// Функция для сравнения двух комплексных чисел по модулю
-bool compareComplexByMagnitude(const Complex& a, const Complex& b) {
-    return abs(a) < abs(b);
-}
+	Customers(string ls, string fn, string c, string st, int hn, int fnn, int an, double ac) : Last_Name(ls), First_Name(fn), City(c), Street(st), House_Number(hn), Flat_Number(fnn), Account_Number(an), Average_Check(ac) {}
 
-// Функция для добавления элемента в отсортированный список
+	bool operator<(const Customers& Other) const
+	{
+		if (Average_Check != Other.Average_Check)
+		{
+			return Average_Check > Other.Average_Check;
+		}
+
+		if (Account_Number != Other.Account_Number)
+		{
+			return Account_Number > Other.Account_Number;
+		}
+
+		return Last_Name < Other.Last_Name;
+	}
+};
+
 template<class T>
-void push(list<T>& lst, const T& element) {
-    typename list<T>::iterator it = lst.begin();
-    while (it != lst.end() && compareComplexByMagnitude(*it, element)) {
-        ++it;
-    }
-    lst.insert(it, element);
+void push(list<T>& lst, const T& Value)
+{
+	class list<T>::const_iterator it = lst.begin();
+	while (it != lst.end() && Value < *it)
+	{
+		++it;
+	}
+	lst.insert(it, Value);
 }
 
-// Функция для удаления элемента из списка
 template<class T>
-bool pop(list<T>& lst, const T& element) {
-    typename list<T>::iterator it = lst.begin();
-    while (it != lst.end()) {
-        if (*it == element) {
-            lst.erase(it);
-            return true;
-        }
-        ++it;
-    }
-    return false;
+T pop(list<T>& lst)
+{
+	if (!lst.empty())
+	{
+		T First_Value = lst.front();
+		lst.pop_front();
+		return First_Value;
+	}
 }
 
-// Функция для фильтрации списка с использованием предиката P
-template<class T, class Predicate>
-list<T> filter(const list<T>& lst, Predicate P) {
-    list<T> filteredList;
-    for (const T& element : lst) {
-        if (P(element)) {
-            filteredList.push_back(element);
-        }
-    }
-    return filteredList;
+bool Predicate(double Module, double Value)
+{
+	return abs(Module) < Value;
 }
 
-// Функция для вывода содержимого списка с помощью итераторов
+list <double> filter(list<double>& lst, double Value)
+{
+	list<double> Result;
+	for (class list<double>::const_iterator it = lst.begin(); it != lst.end(); ++it)
+	{
+		const double i = *it;
+		if (Predicate(i, Value))
+		{
+			Result.push_back(i);
+		}
+	}
+	return Result;
+}
+
 template<class T>
-void printList(const list<T>& lst) {
-    for (const T& element : lst) {
-        cout << element << " ";
-    }
-    cout << endl;
+void PrintList(const list<T>& lst)
+{
+	for (class list<T>::const_iterator it = lst.begin(); it != lst.end(); ++it)
+	{
+		const T& ptr = *it;
+		cout << "Имя: " << ptr.First_Name << "\n" << "Фамилия: " << ptr.Last_Name << "\n" << "Средняя сумма чека: " << ptr.Average_Check << "\n";
+	}
+	cout << "---------------" << "\n";
 }
 
-int main() {
-    list<Complex> complexList;
 
-    // Добавляем комплексные числа в список
-    push(complexList, Complex(2.0, 3.0));
-    push(complexList, Complex(1.0, 4.0));
-    push(complexList, Complex(3.0, 2.0));
-    push(complexList, Complex(5.0, 6.0));
 
-    cout << "Initial list: ";
-    printList(complexList);
+int main()
+{
+	setlocale(LC_ALL, "RU_ru");
 
-    // Удаляем элемент из списка
-    Complex toRemove(3.0, 2.0);
-    bool removed = pop(complexList, toRemove);
-    if (removed) {
-        cout << "Removed " << toRemove << endl;
-    }
-    else {
-        cout << "Element " << toRemove << " not found in the list" << endl;
-    }
+	// Задание 1.1
 
-    cout << "List after removal: ";
-    printList(complexList);
+	list<double> List1 = { 1, 2.5, -3.4, 12, 7.2 };		//Создание списка и его демонстрация
+	cout << "Список чисел: " << "\n";
+	for (double c : List1)
+	{
+		cout << "[" << c << "]" << "\n";
+	}
+	cout << "---------------" << "\n";
 
-    // Фильтрация списка
-    auto filterPredicate = [](const Complex& c) {
-        return static_cast<int>(real(c)) % 2 == 0; // Проверяем, четная ли действительная часть
-    };
+	push(List1, 2.1); //Демонстрация функции push() для списка
+	push(List1, -4.2);
+	cout << "Список чисел: " << "\n";
+	for (double c : List1)
+	{
+		cout << "[" << c << "]" << "\n";
+	}
+	cout << "---------------" << "\n";
 
-    list<Complex> filtered = filter(complexList, filterPredicate);
+	list<double> FiltredList = filter(List1, 5); //Демонстрация функции filter() для списка
+	cout << "Список чисел: " << "\n";
+	for (double c : FiltredList)
+	{
+		cout << "[" << c << "]" << "\n";
+	}
+	cout << "---------------" << "\n";
 
-    cout << "Filtered list: ";
-    printList(filtered);
+	pop(List1);
+	cout << "Список чисел: " << "\n";
+	for (double c : List1)
+	{
+		cout << "[" << c << "]" << "\n";
+	}
+	cout << "---------------" << "\n";		//Демонстарция функции pop() для списка
 
-    return 0;
-}
+	// Задание 1.2
+
+	list<Customers> CustomersList;
+
+	push(CustomersList, Customers("Иванов", "Петр", "Москва", "Ленина", 10, 5, 123456, 1500));
+	push(CustomersList, Customers("Петров", "Иван", "Санкт-Петербург", "Примерная", 15, 3, 789012, 1200));
+	push(CustomersList, Customers("Сидоров", "Анна", "Москва", "Мира", 20, 7, 345678, 1800));
+	push(CustomersList, Customers("Дягтерёв", "Евгений", "Севастополь", "Гоголя", 27, 6, 245698, 500));
+
+	cout << "Список покупателей" << "\n";
+	PrintList(CustomersList);
+
+	if (!CustomersList.empty())
+	{
+		Customers UpdatedCustomersList = pop(CustomersList);
+		cout << "Удалённый покупатель с наивысшим приоритетом:" << "\n";
+		cout << "Имя: " << UpdatedCustomersList.First_Name << "\n" << "Фамилия: " << UpdatedCustomersList.Last_Name << "\n" << "Средняя сумма чека: " << UpdatedCustomersList.Average_Check << "\n";
+	}
+
+	cout << "Список покупателей после удаления: " << "\n";
+	PrintList(CustomersList);
+};
