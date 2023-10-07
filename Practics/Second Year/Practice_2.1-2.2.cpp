@@ -24,29 +24,36 @@ map<string, double> filter(const map<string, double>& mp, double Threshold) {
 
 void FindElem(const map<string, double>& mp, string key)
 {
+    bool found = false;
     auto it = mp.find(key);
     if (it != mp.end())
     {
         cout << "\nFound Element:\n";
         cout << "Key: " << it->first << ", Value: " << it->second << "\n";
+        found = true;
+    }
+    if (!found)
+    {
+        cout << "\nElement " << key << " not found\n";
     }
 }
 
 void FindElem(const map<string, double>& mp, double v)
 {
+    bool found = false;
     for (const auto& it : mp) 
     {
         if (it.second == v)
         {
             cout << "\nFound Element:\n";
             cout << "Key: " << it.first << ", Value: " << it.second << "\n";
-            break;
+            found = true;
         }
-        else
-        {
-            cout << "\nElement " << v << " not found\n";
-            break;
-        }
+        
+    }
+    if (!found)
+    {
+        cout << "\nElement " << v << " not found\n";
     }
 }
 
@@ -108,13 +115,19 @@ void FindElem(const multimap<string, double>& mmapp, string key)
 
 void FindElem(const multimap<string, double>& mmap, double v)
 {
+    bool found = false;
     for (const auto& it : mmap)
     {
         if (it.second == v)
         {
             cout << "\nFound Element:\n";
             cout << "Key: " << it.first << ", Value: " << it.second << "\n";
+            found = true;
         }
+    }
+    if (!found)
+    {
+        cout << "\nElement " << v << " not found\n";
     }
 }
 
@@ -208,7 +221,7 @@ int main()
 
     FindElem(AvgCheck, "Ivanov Petr");
     FindElem(AvgCheck, "Ivanov Ivan");
-    FindElem(AvgCheck, 1200.0);
+    FindElem(AvgCheck, 1800.0);
     FindElem(AvgCheck, 3100.0);
 
     PrintMap(AvgCheck);
@@ -277,6 +290,8 @@ int main()
     AvgCheck2.insert(AvgCheck2.begin(), { "Dyagteryov Evgeniy", 500.0 });
     AvgCheck2.insert(AvgCheck2.begin(), { "Petrov Ivan", 2200.0 });
     AvgCheck2.insert(AvgCheck2.begin(), { "Sidorova Anna", 2400.0 });
+
+    PrintMultimap(AvgCheck2);
 
     FindElem(AvgCheck2, "Petrov Ivan");
     FindElem(AvgCheck2, "Petrov Petr");
