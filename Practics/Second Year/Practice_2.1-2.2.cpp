@@ -45,6 +45,7 @@ void FindElem(const map<string, double>& mp, double v)
         else
         {
             cout << "\nElement " << v << " not found\n";
+            break;
         }
     }
 }
@@ -156,8 +157,6 @@ multimap<string, double> SameElem(const multimap<string, double>& mmap, string K
 
 int main()
 {
-    setlocale(LC_ALL, "RU_ru");
-
     map<string, double> AvgCheck;
 
     AvgCheck["Ivanov Petr"] = 1500.0;
