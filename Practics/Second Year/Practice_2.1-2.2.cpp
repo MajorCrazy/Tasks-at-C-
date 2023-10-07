@@ -4,18 +4,9 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
-#include <string>
-#include <locale>
 #include <vector>
 #include <set>
 using namespace std;
-
-//string Capitalize(string str) {
-//    if (!str.empty()) {
-//        str[0] = toupper(str[0]);
-//    }
-//    return str;
-//}
 
 bool Predicate(double V, double Threshold)
 {
@@ -40,10 +31,6 @@ void FindElem(const map<string, double>& mp, string key)
         cout << "\nFound Element:\n";
         cout << "Key: " << it->first << ", Value: " << it->second << "\n";
     }
-    else
-    {
-        cout << "\nElement not found\n";
-    }
 }
 
 void FindElem(const map<string, double>& mp, double v)
@@ -55,6 +42,10 @@ void FindElem(const map<string, double>& mp, double v)
             cout << "\nFound Element:\n";
             cout << "Key: " << it.first << ", Value: " << it.second << "\n";
             break;
+        }
+        else
+        {
+            cout << "\nElement " << v << " not found\n";
         }
     }
 }
@@ -82,7 +73,7 @@ vector<double> Values(const map<string, double>& mp)
 
 void PrintVector(const vector<double>& vec)
 {
-    cout << "\nЗначения вектора: ";
+    cout << "\nVector values: ";
     for (double Value : vec)
     {
         cout << Value << " ";
@@ -90,26 +81,79 @@ void PrintVector(const vector<double>& vec)
     cout << "\n";
 }
 
-//void CheckOut(map<string, double>& mp)
-//{
-//    setlocale(LC_ALL, "RU_ru");
-//
-//    string NewKey;
-//    double NewValue;
-//    cout << "\nВведите ключ:";
-//    cin.ignore();
-//    getline(cin, NewKey);
-//
-//    if (mp.find(Capitalize(NewKey)) != mp.end())
-//    {
-//        throw logic_error("Ошибка: Дублирующийся ключ!");
-//    }
-//
-//    cout << "\nВведите значение: ";
-//    cin >> NewValue;
-//
-//    mp[Capitalize(NewKey)] = NewValue;
-//}
+void PrintMultimap(const multimap<string, double>& mmap)
+{
+    auto it = mmap.begin();
+    cout << "\nMultimap: \n";
+    while (it != mmap.end())
+    {
+        cout << "Key: " << it->first << ", Value: " << it->second << "\n";
+        it++;
+    }
+}
+
+void FindElem(const multimap<string, double>& mmapp, string key)
+{
+    auto it = mmapp.find(key);
+    if (it != mmapp.end())
+    {
+        cout << "\nFound Element:\n";
+        cout << "Key: " << it->first << ", Value: " << it->second << "\n";
+    }
+    else
+    {
+        cout << "\nElement " << key << " not found\n";
+    }
+}
+
+void FindElem(const multimap<string, double>& mmap, double v)
+{
+    for (const auto& it : mmap)
+    {
+        if (it.second == v)
+        {
+            cout << "\nFound Element:\n";
+            cout << "Key: " << it.first << ", Value: " << it.second << "\n";
+        }
+    }
+}
+
+multimap<string, double> filter(const multimap<string, double>& mmap, double Threshold) 
+{
+    multimap<string, double> Result;
+    for (const auto& it : mmap) 
+    {
+        if (Predicate(it.second, Threshold)) 
+        {
+            Result.insert(it);
+        }
+    }
+    return Result;
+}
+
+vector<double> Values(const multimap<string, double>& mp)
+{
+    set<double> Val;
+    for (const auto& it : mp)
+    {
+        Val.insert(it.second);
+    }
+    return vector<double>(Val.begin(), Val.end());
+}
+
+multimap<string, double> SameElem(const multimap<string, double>& mmap, string Key)
+{
+    multimap<string, double> Result;
+    for (const auto& it : mmap)
+    {
+        if (it.first == Key)
+        {
+            Result.insert(it);
+        }
+    }
+
+    return Result;
+}
 
 int main()
 {
@@ -124,21 +168,222 @@ int main()
 
     PrintMap(AvgCheck);
 
-    FindElem(AvgCheck, "Ivanov Petr");
-    FindElem(AvgCheck, 1200.0);
+    cout << "\n-----Test try-catch-----\n";
+    try
+    {
+        string Key = "Ponamarev Nikita";
+        double Value = 1900.0;
 
-    /*CheckOut(AvgCheck);*/
+        if (AvgCheck.find(Key) != AvgCheck.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        AvgCheck[Key] = Value;
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMap(AvgCheck);
+
+    cout << "\n-----Test try-catch 2-----\n";
+    try
+    {
+        string Key = "Petrov Ivan";
+        double Value = 1900.0;
+
+        if (AvgCheck.find(Key) != AvgCheck.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        AvgCheck[Key] = Value;
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMap(AvgCheck);
+
+    FindElem(AvgCheck, "Ivanov Petr");
+    FindElem(AvgCheck, "Ivanov Ivan");
+    FindElem(AvgCheck, 1200.0);
+    FindElem(AvgCheck, 3100.0);
+
     PrintMap(AvgCheck);
 
     vector<double> Values_Of_AvgCheck = Values(AvgCheck);
     PrintVector(Values_Of_AvgCheck);
 
-    map<string, double> filtred_AvgCheck = filter(AvgCheck, 1000.0);
+    map<string, double> filtered_AvgCheck = filter(AvgCheck, 1000.0);
     
-    PrintMap(filtred_AvgCheck);
+    PrintMap(filtered_AvgCheck);
 
-    FindElem(filtred_AvgCheck, "Sidorova Anna");
-    FindElem(filtred_AvgCheck, 1500.0);
+    cout << "\n-----Test try-catch 3-----\n";
+    try
+    {
+        string Key = "Ponamarev Nikita";
+        double Value = 1900.0;
 
-    vector<double> Values_Of_Filtred_AvgCheck = Values(filtred_AvgCheck);
+        if (filtered_AvgCheck.find(Key) != filtered_AvgCheck.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        filtered_AvgCheck[Key] = Value;
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMap(filtered_AvgCheck);
+
+    cout << "\n-----Test try-catch 4-----\n";
+    try
+    {
+        string Key = "Kondrashov Alexander";
+        double Value = 2000.0;
+
+        if (filtered_AvgCheck.find(Key) != filtered_AvgCheck.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        filtered_AvgCheck[Key] = Value;
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMap(filtered_AvgCheck);
+
+    FindElem(filtered_AvgCheck, "Sidorova Anna");
+    FindElem(filtered_AvgCheck, "Petrov Petr");
+    FindElem(filtered_AvgCheck, 1500.0);
+    FindElem(filtered_AvgCheck, 3000.0);
+
+    vector<double> Values_Of_Filtred_AvgCheck = Values(filtered_AvgCheck);
     PrintVector(Values_Of_Filtred_AvgCheck);
+
+    cout << "\n----------Task 2.2----------\n";
+
+    multimap<string, double> AvgCheck2;
+    AvgCheck2.insert(AvgCheck2.begin(), { "Ivanov Petr", 1500.0 });
+    AvgCheck2.insert(AvgCheck2.begin(), { "Petrov Ivan", 1200.0 });
+    AvgCheck2.insert(AvgCheck2.begin(), { "Sidorova Anna", 1800.0 });
+    AvgCheck2.insert(AvgCheck2.begin(), { "Dyagteryov Evgeniy", 500.0 });
+    AvgCheck2.insert(AvgCheck2.begin(), { "Petrov Ivan", 2200.0 });
+    AvgCheck2.insert(AvgCheck2.begin(), { "Sidorova Anna", 2400.0 });
+
+    FindElem(AvgCheck2, "Petrov Ivan");
+    FindElem(AvgCheck2, "Petrov Petr");
+    FindElem(AvgCheck2, 500.0);
+    FindElem(AvgCheck2, 400.0);
+
+    PrintMultimap(AvgCheck2);
+
+    cout << "\n-----Test try-catch 1-----\n";
+    try
+    {
+        string Key = "Ivanov Petr";
+        double Value = 1450.0;
+        if (AvgCheck2.find(Key) != AvgCheck2.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        AvgCheck2.insert(AvgCheck2.begin(), { Key, Value });
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMultimap(AvgCheck2);
+
+    cout << "\n-----Test try-catch 2-----\n";
+    try
+    {
+        string Key = "Ponamarev Nikita";
+        double Value = 1450.0;
+        if (AvgCheck2.find(Key) != AvgCheck2.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        AvgCheck2.insert(AvgCheck2.begin(), { Key, Value });
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMultimap(AvgCheck2);
+
+    vector<double> Values_Of_AvgCheck2 = Values(AvgCheck2);
+    PrintVector(Values_Of_AvgCheck2);
+
+    multimap<string, double> SameElem_of_AvgCheck2 = SameElem(AvgCheck2, "Sidorova Anna");
+    PrintMultimap(SameElem_of_AvgCheck2);
+
+    multimap<string, double> filtered_AvgCheck2 = filter(AvgCheck2, 1400.0);
+    PrintMultimap(filtered_AvgCheck2);
+
+    filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { "Ivanov Petr", 2600.0 });
+
+    FindElem(filtered_AvgCheck2, "Sidorova Anna");
+    FindElem(filtered_AvgCheck2, "Ivanov Nikolay");
+    FindElem(filtered_AvgCheck2, 1500.0);
+    FindElem(filtered_AvgCheck2, 1250.0);
+
+    PrintMultimap(filtered_AvgCheck2);
+
+    cout << "\n-----Test try-catch 3-----\n";
+    try
+    {
+        string Key = "Ponamarev Nikita";
+        double Value = 1950.0;
+        if (filtered_AvgCheck2.find(Key) != filtered_AvgCheck2.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { Key, Value });
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMultimap(filtered_AvgCheck2);
+
+    cout << "\n-----Test try-catch 4-----\n";
+    try
+    {
+        string Key = "Kondrashov Alexander";
+        double Value = 2050.0;
+        if (filtered_AvgCheck2.find(Key) != filtered_AvgCheck2.end())
+        {
+            throw invalid_argument("Element with key " + Key + " already exists.");
+        }
+
+        filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { Key, Value });
+    }
+    catch (const invalid_argument& e)
+    {
+        cerr << "\nException: " << e.what() << "\n";
+    }
+
+    PrintMultimap(filtered_AvgCheck2);
+
+    vector<double> Values_Of_filtered_AvgCheck2 = Values(filtered_AvgCheck2);
+    PrintVector(Values_Of_filtered_AvgCheck2);
+
+    multimap<string, double> SameElem_of_filtered_AvgCheck2 = SameElem(filtered_AvgCheck2, "Ivanov Petr");
+    PrintMultimap(SameElem_of_filtered_AvgCheck2);
+}
