@@ -39,7 +39,7 @@ public:
 template<class T>
 void push(list<T>& lst, const T& Value)
 {
-	class list<T>::const_iterator it = lst.begin();
+	auto it = lst.begin();
 	while (it != lst.end() && Value < *it)
 	{
 		++it;
@@ -58,20 +58,15 @@ T pop(list<T>& lst)
 	}
 }
 
-bool Predicate(double Module, double Value)
+template<class T, class Predicate>
+list<T> filter(list<T>& lst, Predicate P)
 {
-	return abs(Module) < Value;
-}
-
-list <double> filter(list<double>& lst, double Value)
-{
-	list<double> Result;
-	for (class list<double>::const_iterator it = lst.begin(); it != lst.end(); ++it)
+	list<T> Result;
+	for (const T& it : lst)
 	{
-		const double i = *it;
-		if (Predicate(i, Value))
+		if (P(it))
 		{
-			Result.push_back(i);
+			Result.push_back(it);
 		}
 	}
 	return Result;
@@ -113,7 +108,7 @@ int main()
 	}
 	cout << "---------------" << "\n";
 
-	list<double> FiltredList = filter(List1, 5); //Демонстрация функции filter() для списка
+	list<double> FiltredList = filter(List1, [](double Value) { return abs(Value) < 5; }); //Демонстрация функции filter() для списка
 	cout << "Список чисел: " << "\n";
 	for (double c : FiltredList)
 	{
@@ -135,7 +130,7 @@ int main()
 
 	push(CustomersList, Customers("Иванов", "Петр", "Москва", "Ленина", 10, 5, 123456, 1500));
 	push(CustomersList, Customers("Петров", "Иван", "Санкт-Петербург", "Примерная", 15, 3, 789012, 1200));
-	push(CustomersList, Customers("Сидорова", "Анна", "Москва", "Мира", 20, 7, 345678, 1800));
+	push(CustomersList, Customers("Сидоров", "Анна", "Москва", "Мира", 20, 7, 345678, 1800));
 	push(CustomersList, Customers("Дягтерёв", "Евгений", "Севастополь", "Гоголя", 27, 6, 245698, 500));
 
 	cout << "Список покупателей" << "\n";
