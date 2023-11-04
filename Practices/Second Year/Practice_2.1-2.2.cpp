@@ -7,13 +7,57 @@
 #include <set>
 using namespace std;
 
-bool Predicate(double V, double Threshold)
+class Customers
+{
+public:
+    string Last_Name;
+    string First_Name;
+    string City;
+    string Street;
+    int House_Number;
+    int Flat_Number;
+    int Account_Number;
+    double Average_Check;
+
+    Customers(string ls, string fn, string c, string st, int hn, int fnn, int an, double ac) : Last_Name(ls), First_Name(fn), City(c), Street(st), House_Number(hn), Flat_Number(fnn), Account_Number(an), Average_Check(ac) {}
+
+    bool operator<(const Customers& Other) const
+    {
+        if (Average_Check != Other.Average_Check)
+        {
+            return Average_Check > Other.Average_Check;
+        }
+
+        if (Account_Number != Other.Account_Number)
+        {
+            return Account_Number > Other.Account_Number;
+        }
+
+        return Last_Name < Other.Last_Name;
+    }
+
+    bool operator==(const Customers& Other) const {
+        return Last_Name == Other.Last_Name && First_Name == Other.First_Name && City == Other.City && Street == Other.Street && House_Number == Other.House_Number &&
+            Flat_Number == Other.Flat_Number && Account_Number == Other.Account_Number && Average_Check == Other.Average_Check;
+    }
+};
+
+ostream& operator<<(ostream& os, const Customers& customer) {
+     os << customer.Last_Name << " " << customer.First_Name << " " << customer.City
+        << " " << customer.Street << " " << customer.House_Number << " " << customer.Flat_Number
+        << " " << customer.Account_Number << " " << customer.Average_Check;
+    return os;
+}
+
+template<class Value>
+bool Predicate(Value V, Value Threshold)
 {
     return V > Threshold;
 }
 
-map<string, double> filter(const map<string, double>& mp, double Threshold) {
-    map<string, double> Result;
+template<class Key, class Value>
+map<Key, Value> Map_filter(const map<Key, Value>& mp, Value Threshold) {
+    map<Key, Value> Result;
     for (const auto& it : mp) {
         if (Predicate(it.second, Threshold)) {
             Result.insert(it);
@@ -22,7 +66,8 @@ map<string, double> filter(const map<string, double>& mp, double Threshold) {
     return Result;
 }
 
-void FindElem(const map<string, double>& mp, string key)
+template<class Key, class Value>
+void FindValueMap(const map<Key, Value>& mp, Key key)
 {
     bool found = false;
     auto it = mp.find(key);
@@ -32,16 +77,13 @@ void FindElem(const map<string, double>& mp, string key)
         cout << "Key: " << it->first << ", Value: " << it->second << "\n";
         found = true;
     }
-    if (!found)
-    {
-        cout << "\nElement " << key << " not found\n";
-    }
 }
 
-void FindElem(const map<string, double>& mp, double v)
+template<class Key, class Value>
+void FindKeyMap(const map<Key, Value>& mp, Value v)
 {
     bool found = false;
-    for (const auto& it : mp) 
+    for (const auto& it : mp)
     {
         if (it.second == v)
         {
@@ -49,7 +91,7 @@ void FindElem(const map<string, double>& mp, double v)
             cout << "Key: " << it.first << ", Value: " << it.second << "\n";
             found = true;
         }
-        
+
     }
     if (!found)
     {
@@ -57,38 +99,40 @@ void FindElem(const map<string, double>& mp, double v)
     }
 }
 
-void PrintMap(const map<string, double>& mp)
+template<class Key, class Value>
+void PrintMap(const map<Key, Value>& mp)
 {
-    auto it = mp.begin();
     cout << "\nMap: \n";
-    while (it != mp.end())
+    for (auto it = mp.begin(); it != mp.end(); it++)
     {
-        cout << "Key: " << it->first << ", Value: " << it->second << "\n";
-        it++;
+        cout << "Customer: " << it->first << ", Average Check: " << it->second << "\n";
     }
 }
 
-vector<double> Values(const map<string, double>& mp)
+template<class Key, class Value>
+vector<Value> Values_Map(const map<Key, Value>& mp)
 {
-    set<double> Val;
+    set<Value> Val;
     for (const auto& it : mp)
     {
         Val.insert(it.second);
     }
-    return vector<double>(Val.begin(), Val.end());
+    return vector<Value>(Val.begin(), Val.end());
 }
 
-void PrintVector(const vector<double>& vec)
+template<class Value>
+void PrintVector(const vector<Value>& vec)
 {
     cout << "\nVector values: ";
-    for (double Value : vec)
+    for (Value Value : vec)
     {
         cout << Value << " ";
     }
     cout << "\n";
 }
 
-void PrintMultimap(const multimap<string, double>& mmap)
+template<class Key, class Value>
+void PrintMultiMap(const multimap<Key, Value>& mmap)
 {
     auto it = mmap.begin();
     cout << "\nMultimap: \n";
@@ -99,7 +143,8 @@ void PrintMultimap(const multimap<string, double>& mmap)
     }
 }
 
-void FindElem(const multimap<string, double>& mmapp, string key)
+template<class Key, class Value>
+void FindValueMultiMap(const multimap<Key, Value>& mmapp, Key key)
 {
     auto it = mmapp.find(key);
     if (it != mmapp.end())
@@ -113,7 +158,8 @@ void FindElem(const multimap<string, double>& mmapp, string key)
     }
 }
 
-void FindElem(const multimap<string, double>& mmap, double v)
+template<class Key, class Value>
+void FindKeyMultiMap(const multimap<Key, Value>& mmap, Value v)
 {
     bool found = false;
     for (const auto& it : mmap)
@@ -131,12 +177,13 @@ void FindElem(const multimap<string, double>& mmap, double v)
     }
 }
 
-multimap<string, double> filter(const multimap<string, double>& mmap, double Threshold) 
+template<class Key, class Value>
+multimap<Key, Value> MultiMap_filter(const multimap<Key, Value>& mmap, Value Threshold)
 {
-    multimap<string, double> Result;
-    for (const auto& it : mmap) 
+    multimap<Key, Value> Result;
+    for (const auto& it : mmap)
     {
-        if (Predicate(it.second, Threshold)) 
+        if (Predicate(it.second, Threshold))
         {
             Result.insert(it);
         }
@@ -144,25 +191,26 @@ multimap<string, double> filter(const multimap<string, double>& mmap, double Thr
     return Result;
 }
 
-vector<double> Values(const multimap<string, double>& mp)
+template<class Key, class Value>
+vector<Value> Values_MultiMap(const multimap<Key, Value>& mp)
 {
-    set<double> Val;
+    set<Value> Val;
     for (const auto& it : mp)
     {
         Val.insert(it.second);
     }
-    return vector<double>(Val.begin(), Val.end());
+    return vector<Value>(Val.begin(), Val.end());
 }
 
-multimap<string, double> SameElem(const multimap<string, double>& mmap, string Key)
+template<class Key, class Value>
+multimap<Key, Value> SameElem(const multimap<Key, Value>& mmap, const Key& key)
 {
-    multimap<string, double> Result;
-    for (const auto& it : mmap)
+    multimap<Key, Value> Result;
+
+    auto range = mmap.equal_range(key);
+    for (auto it = range.first; it != range.second; ++it)
     {
-        if (it.first == Key)
-        {
-            Result.insert(it);
-        }
+        Result.emplace(it->first, it->second);
     }
 
     return Result;
@@ -170,233 +218,93 @@ multimap<string, double> SameElem(const multimap<string, double>& mmap, string K
 
 int main()
 {
-    map<string, double> AvgCheck;
+    map<Customers, double> MyMap;
 
-    AvgCheck["Ivanov Petr"] = 1500.0;
-    AvgCheck["Petrov Ivan"] = 1200.0;
-    AvgCheck["Sidorova Anna"] = 1800.0;
-    AvgCheck["Dyagteryov Evgeniy"] = 500.0;
+    Customers customer1("Ivanov", "Petr", "Moscow", "Lenin", 10, 5, 123456, 1500.0);
+    Customers customer2("Petrov", "Ivan", "Saint-Petersburg", "Primernaya", 15, 3, 789012, 1200.0);
+    Customers customer3("Sidorova", "Anna", "Moscow", "Mira", 20, 7, 345678, 1800.0);
+    Customers customer4("Dyagterev", "Evgeniy", "Sevastopol", "Gogolya", 27, 6, 245698, 500.0);
 
-    PrintMap(AvgCheck);
+    cout << "\n-----Test try-catch map 1-----" << endl;
 
-    cout << "\n-----Test try-catch-----\n";
     try
     {
-        string Key = "Ponamarev Nikita";
-        double Value = 1900.0;
+        MyMap[customer1] = 1500.0;
+        MyMap[customer2] = 1200.0;
+        MyMap[customer3] = 1800.0;
+        MyMap[customer4] = 500.0;
 
-        if (AvgCheck.find(Key) != AvgCheck.end())
+        Customers Key = customer1;
+        double Value = 1750.0;
+
+        if (MyMap.find(Key) != MyMap.end())
         {
-            throw invalid_argument("Element with key " + Key + " already exists.");
+            throw invalid_argument("Element with that key already exists.");
         }
 
-        AvgCheck[Key] = Value;
+        MyMap[Key] = Value;
     }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
-
-    PrintMap(AvgCheck);
-
-    cout << "\n-----Test try-catch 2-----\n";
-    try
-    {
-        string Key = "Petrov Ivan";
-        double Value = 1900.0;
-
-        if (AvgCheck.find(Key) != AvgCheck.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
-
-        AvgCheck[Key] = Value;
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
+    catch (const invalid_argument& e) {
+        cerr << "Exception: " << e.what() << endl;
     }
 
-    PrintMap(AvgCheck);
+    PrintMap(MyMap);
 
-    FindElem(AvgCheck, "Ivanov Petr");
-    FindElem(AvgCheck, "Ivanov Ivan");
-    FindElem(AvgCheck, 1800.0);
-    FindElem(AvgCheck, 3100.0);
+    FindValueMap(MyMap, customer1);
 
-    PrintMap(AvgCheck);
+    FindKeyMap(MyMap, 1200.0);
+    FindKeyMap(MyMap, 1750.0);
 
-    vector<double> Values_Of_AvgCheck = Values(AvgCheck);
-    PrintVector(Values_Of_AvgCheck);
+    map<Customers, double> MyFilteredMap = Map_filter(MyMap, 1000.0);
+    PrintMap(MyFilteredMap);
 
-    map<string, double> filtered_AvgCheck = filter(AvgCheck, 1000.0);
-    
-    PrintMap(filtered_AvgCheck);
+    FindValueMap(MyFilteredMap, customer3);
 
-    cout << "\n-----Test try-catch 3-----\n";
-    try
-    {
-        string Key = "Ponamarev Nikita";
-        double Value = 1900.0;
+    FindKeyMap(MyFilteredMap, 1200.0);
+    FindKeyMap(MyFilteredMap, 1000.0);
 
-        if (filtered_AvgCheck.find(Key) != filtered_AvgCheck.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
+    vector<double> Result = Values_Map(MyMap);
+    PrintVector(Result);
 
-        filtered_AvgCheck[Key] = Value;
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
+    vector<double> Result1 = Values_Map(MyFilteredMap);
+    PrintVector(Result1);
 
-    PrintMap(filtered_AvgCheck);
+    cout << "\n-----Practice 2.2-----" << endl;
 
-    cout << "\n-----Test try-catch 4-----\n";
-    try
-    {
-        string Key = "Kondrashov Alexander";
-        double Value = 2000.0;
+    multimap<Customers, double> MyMultiMap;
 
-        if (filtered_AvgCheck.find(Key) != filtered_AvgCheck.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
+    MyMultiMap.emplace(customer1, 1500.0);
+    MyMultiMap.emplace(customer2, 1200.0);
+    MyMultiMap.emplace(customer3, 1800.0);
+    MyMultiMap.emplace(customer4, 500.0);
+    MyMultiMap.emplace(customer1, 1950.0);
+    MyMultiMap.emplace(customer1, 1000.0);
 
-        filtered_AvgCheck[Key] = Value;
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
+    PrintMultiMap(MyMultiMap);
 
-    PrintMap(filtered_AvgCheck);
+    FindValueMultiMap(MyMultiMap, customer2);
 
-    FindElem(filtered_AvgCheck, "Sidorova Anna");
-    FindElem(filtered_AvgCheck, "Petrov Petr");
-    FindElem(filtered_AvgCheck, 1500.0);
-    FindElem(filtered_AvgCheck, 3000.0);
+    FindKeyMultiMap(MyMultiMap, 1800.0);
+    FindKeyMultiMap(MyMultiMap, 1900.0);
 
-    vector<double> Values_Of_Filtred_AvgCheck = Values(filtered_AvgCheck);
-    PrintVector(Values_Of_Filtred_AvgCheck);
+    multimap<Customers, double> MyFilteredMultiMap = MultiMap_filter(MyMultiMap, 1200.0);
 
-    cout << "\n----------Task 2.2----------\n";
+    PrintMultiMap(MyFilteredMultiMap);
 
-    multimap<string, double> AvgCheck2;
-    AvgCheck2.insert(AvgCheck2.begin(), { "Ivanov Petr", 1500.0 });
-    AvgCheck2.insert(AvgCheck2.begin(), { "Petrov Ivan", 1200.0 });
-    AvgCheck2.insert(AvgCheck2.begin(), { "Sidorova Anna", 1800.0 });
-    AvgCheck2.insert(AvgCheck2.begin(), { "Dyagteryov Evgeniy", 500.0 });
-    AvgCheck2.insert(AvgCheck2.begin(), { "Petrov Ivan", 2200.0 });
-    AvgCheck2.insert(AvgCheck2.begin(), { "Sidorova Anna", 2400.0 });
+    FindValueMultiMap(MyFilteredMultiMap, customer2);
 
-    PrintMultimap(AvgCheck2);
+    FindKeyMultiMap(MyFilteredMultiMap, 1800.0);
+    FindKeyMultiMap(MyFilteredMultiMap, 500.0);
 
-    FindElem(AvgCheck2, "Petrov Ivan");
-    FindElem(AvgCheck2, "Petrov Petr");
-    FindElem(AvgCheck2, 500.0);
-    FindElem(AvgCheck2, 400.0);
+    vector<double> Result3 = Values_MultiMap(MyMultiMap);
+    PrintVector(Result3);
 
-    PrintMultimap(AvgCheck2);
+    vector<double> Result4 = Values_MultiMap(MyFilteredMultiMap);
+    PrintVector(Result4);
 
-    cout << "\n-----Test try-catch 1-----\n";
-    try
-    {
-        string Key = "Ivanov Petr";
-        double Value = 1450.0;
-        if (AvgCheck2.find(Key) != AvgCheck2.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
+    multimap<Customers, double> SameElement_of_MyMultimap = SameElem(MyMultiMap, customer1);
+    PrintMultiMap(SameElement_of_MyMultimap);
 
-        AvgCheck2.insert(AvgCheck2.begin(), { Key, Value });
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
-
-    PrintMultimap(AvgCheck2);
-
-    cout << "\n-----Test try-catch 2-----\n";
-    try
-    {
-        string Key = "Ponamarev Nikita";
-        double Value = 1450.0;
-        if (AvgCheck2.find(Key) != AvgCheck2.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
-
-        AvgCheck2.insert(AvgCheck2.begin(), { Key, Value });
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
-
-    PrintMultimap(AvgCheck2);
-
-    vector<double> Values_Of_AvgCheck2 = Values(AvgCheck2);
-    PrintVector(Values_Of_AvgCheck2);
-
-    multimap<string, double> SameElem_of_AvgCheck2 = SameElem(AvgCheck2, "Sidorova Anna");
-    PrintMultimap(SameElem_of_AvgCheck2);
-
-    multimap<string, double> filtered_AvgCheck2 = filter(AvgCheck2, 1400.0);
-    PrintMultimap(filtered_AvgCheck2);
-
-    filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { "Ivanov Petr", 2600.0 });
-
-    FindElem(filtered_AvgCheck2, "Sidorova Anna");
-    FindElem(filtered_AvgCheck2, "Ivanov Nikolay");
-    FindElem(filtered_AvgCheck2, 1500.0);
-    FindElem(filtered_AvgCheck2, 1250.0);
-
-    PrintMultimap(filtered_AvgCheck2);
-
-    cout << "\n-----Test try-catch 3-----\n";
-    try
-    {
-        string Key = "Ponamarev Nikita";
-        double Value = 1950.0;
-        if (filtered_AvgCheck2.find(Key) != filtered_AvgCheck2.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
-
-        filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { Key, Value });
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
-
-    PrintMultimap(filtered_AvgCheck2);
-
-    cout << "\n-----Test try-catch 4-----\n";
-    try
-    {
-        string Key = "Kondrashov Alexander";
-        double Value = 2050.0;
-        if (filtered_AvgCheck2.find(Key) != filtered_AvgCheck2.end())
-        {
-            throw invalid_argument("Element with key " + Key + " already exists.");
-        }
-
-        filtered_AvgCheck2.insert(filtered_AvgCheck2.begin(), { Key, Value });
-    }
-    catch (const invalid_argument& e)
-    {
-        cerr << "\nException: " << e.what() << "\n";
-    }
-
-    PrintMultimap(filtered_AvgCheck2);
-
-    vector<double> Values_Of_filtered_AvgCheck2 = Values(filtered_AvgCheck2);
-    PrintVector(Values_Of_filtered_AvgCheck2);
-
-    multimap<string, double> SameElem_of_filtered_AvgCheck2 = SameElem(filtered_AvgCheck2, "Ivanov Petr");
-    PrintMultimap(SameElem_of_filtered_AvgCheck2);
+    multimap<Customers, double> SameElement_of_MyFilteredMultiMap = SameElem(MyFilteredMultiMap, customer1);
+    PrintMultiMap(SameElement_of_MyFilteredMultiMap);
 }
