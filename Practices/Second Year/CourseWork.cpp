@@ -517,7 +517,7 @@ public:
 
                     double heuristicCost = heuristic(v, to);
 
-                    // Используйте здесь ваш баланс между длительностью и ценой
+                    // Используйте здесь баланс между длительностью и ценой
                     double combinedCost = costWeight * costToV + durationWeight * durationToV + heuristicCost;
 
                     if (combinedCost < totalCost[v]) {
@@ -525,9 +525,9 @@ public:
                         parent[v] = u;
                         pq.push({ combinedCost, v });
                     } else {
-                        // Путь считается неэффективным, выведите сообщение или сохраните информацию
+                        // Путь считается неэффективным
                         cout << "Inefficient path from " << destinations[u] << " to " << destinations[v] << " is discarded.\n";
-                        // Или сохраните информацию в структуре данных для последующего анализа
+                        // сохраняет информацию в структуре данных для последующего анализа
                         inefficientPaths.push_back({ destinations[u], destinations[v] });
                     }
                 }
@@ -552,13 +552,10 @@ public:
 
     void processingThreadFindRoute(const string& fromCity) {
         for (size_t i = 0; i < destinations.size(); ++i) {
-            // Ваш код обработки вершины
 
-            // Пример: вызов метода поиска маршрута для каждой вершины
+            // вызов метода поиска маршрута для каждой вершины
             findRoute(fromCity, destinations[i]);
-
             // Периодически выводим текущий прогресс
-           
             cout << "\nProgress: " << i + 1 << " out of " << destinations.size() << " vertices processed.\n";
             
         }
