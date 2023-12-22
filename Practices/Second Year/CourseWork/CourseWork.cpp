@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -270,6 +270,9 @@ public:
         distances[from][0] = 0; // 0 для длительности
         distances[from][1] = 0; // 1 для цены
 
+        const double Max_Negative_Cost = -5000;
+        const int Max_Negative_Duration = -50;
+
         for (size_t count = 0; count < destinations.size() - 1; ++count) {
             for (size_t i = 0; i < destinations.size(); ++i) {
                 for (size_t j = 0; j < destinations.size(); ++j) {
@@ -278,34 +281,23 @@ public:
                         if (distances[i][0] != numeric_limits<int>::max() &&
                             distances[i][0] + adjacencyMatrix[i][j].duration < distances[j][0]) {
                             distances[j][0] = distances[i][0] + adjacencyMatrix[i][j].duration;
+                            if (distances[j][0] < Max_Negative_Duration) {
+                                cerr << "\nNegative cycle has been detected\n";
+                                return false;
+                            }
                             parents[j][0] = i;
                         }
+                        
                         // Релаксация для цены
                         if (distances[i][1] != numeric_limits<int>::max() &&
                             distances[i][1] + adjacencyMatrix[i][j].cost < distances[j][1]) {
                             distances[j][1] = distances[i][1] + adjacencyMatrix[i][j].cost;
+                            if (distances[j][0] < Max_Negative_Cost) {
+                                cerr << "\nNegative cycle has been detected\n";
+                                return false;
+                            }
                             parents[j][1] = i;
                         }
-                    }
-                }
-            }
-        }
-
-        // Проверка наличия отрицательных циклов
-        for (size_t i = 0; i < destinations.size(); ++i) {
-            for (size_t j = 0; j < destinations.size(); ++j) {
-                if (adjacencyMatrix[i][j].cost > 0) {
-                    if (distances[i][0] != numeric_limits<int>::max() &&
-                        distances[i][0] + adjacencyMatrix[i][j].duration < distances[j][0]) {
-                        // Обнаружен отрицательный цикл
-                        cerr << "\nNegative cycle has been detected\n";
-                        return false;
-                    }
-                    if (distances[i][1] != numeric_limits<int>::max() &&
-                        distances[i][1] + adjacencyMatrix[i][j].cost < distances[j][1]) {
-                        // Обнаружен отрицательный цикл
-                        cerr << "\nNegative cycle has been detected\n";
-                        return false;
                     }
                 }
             }
