@@ -71,6 +71,7 @@ public:
             [](const Document& lhs, const Document& rhs) {
                 return lhs.relevance > rhs.relevance;
             });
+
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
@@ -78,7 +79,6 @@ public:
     }
 
 private:
-
     struct Query {
         set<string> minus_words;
         set<string> plus_words;
@@ -106,10 +106,10 @@ private:
         Query query_words;
         for (const string& word : SplitIntoWordsNoStop(text)) {
             if (CheckMinus(word)) {
-                query_words.plus_words.insert(word);
+                query_words.minus_words.insert(word.substr(1));
             }
             else {
-                query_words.minus_words.insert(word.substr(1));
+                query_words.plus_words.insert(word);
             }
         }
         return query_words;
@@ -118,52 +118,56 @@ private:
     vector<Document> FindAllDocuments(const Query& query_words) const {
         vector<Document> matched_documents;
         map<int, int> relevance;
+
         for (const auto& plus_word : query_words.plus_words) {
             if (documents_.count(plus_word)) {
-                for (const auto& documents_id : documents_.at(plus_word)) {
-                    relevance[documents_id] += 1;
+                for (const auto& document_id : documents_.at(plus_word)) {
+                    relevance[document_id]++;
                 }
             }
+        }
 
-            for (const auto& id : DocumentWithoutMinusWords(documents_, query_words.minus_words)) {
-                if (relevance.first == id) {
-                    vector<Document> matched_documents.push_back({ id, relevance.second };)//relevance.at(id)
+        for (const auto& id : DocumentWithoutMinusWords(documents_, query_words.minus_words)) {
+            if (relevance.count(id) > 0) {
+                matched_documents.push_back({ id, relevance.at(id) });
+            }
+        }
+        return matched_documents;
+    }
+
+    bool CheckMinus(const string& query) const {
+        return query[0] == '-';
+    }
+
+    set<int> DocumentWithoutMinusWords(const map<string, set<int>>& doc, const set<string>& minus_words) const {
+        set<int> search;
+        for (const auto& current : doc) {
+            if (!minus_words.count(current.first)) {
+                for (int id : current.second) {
+                    search.insert(id);
                 }
             }
-            return matched_documents;
         }
-
-        bool CheckMinus(const string & query) const {
-            return !(query[0] == '-');
-        }
-
-        set<int> DocumentWithoutMinusWords(const map<string, set<int>>&doc, const set<string>&minus_words) const {
-            set<int> search;
-            for (const auto& current : doc) {
-                if (!minus_words.count(current.first))
-                    search.insert(current.second);
-            }
-            return search;
-        }
-
-        SearchServer CreateSearchServer() {
-            SearchServer search_server;
-            search_server.SetStopWords(ReadLine());
-            const int document_count = ReadLineWithNumber();
-            for (int document_id = 0; document_id < document_count; ++document_id) {
-                search_server.AddDocument(document_id, ReadLine());
-            }
-
-            return search_server;
-        }
+        return search;
     }
 };
 
-    int main() {
-        const SearchServer search_server = CreateSearchServer();
-
-        const string query = ReadLine();
-        for (const auto& para : search_server.FindTopDocuments(query)) {
-            cout << "{ document_id = "s << para.id << ", relevance = "s << para.relevance << " }"s << endl;
-        }
+SearchServer CreateSearchServer() {
+    SearchServer search_server;
+    search_server.SetStopWords(ReadLine());
+    const int document_count = ReadLineWithNumber();
+    for (int document_id = 0; document_id < document_count; ++document_id) {
+        search_server.AddDocument(document_id, ReadLine());
     }
+
+    return search_server;
+}
+
+int main() {
+    const SearchServer search_server = CreateSearchServer();
+
+    const string query = ReadLine();
+    for (const auto& para : search_server.FindTopDocuments(query)) {
+        cout << "{ document_id = " << para.id << ", relevance = " << para.relevance << " }" << endl;
+    }
+}
